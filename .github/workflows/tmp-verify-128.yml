@@ -43,6 +43,7 @@ jobs:
           urls: |
             http://127.0.0.1:4173/use-cases/calculator
           uploadArtifacts: true
+          artifactName: lighthouse-mobile-128
           temporaryPublicStorage: true
 
       - name: Save mobile manifest
@@ -54,6 +55,7 @@ jobs:
           urls: |
             http://127.0.0.1:4173/use-cases/calculator
           uploadArtifacts: true
+          artifactName: lighthouse-desktop-128
           temporaryPublicStorage: true
           configPath: './.github/lhci-desktop.json'
 
