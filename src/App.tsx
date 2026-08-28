@@ -26,6 +26,7 @@ const Faq = lazy(() => import('./pages/Faq'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Newsletter = lazy(() => import('./pages/Newsletter'));
 const UseCases = lazy(() => import('./pages/UseCases'));
+const CostCalculatorPage = lazy(() => import('./pages/CostCalculatorPage'));
 const Stellar = lazy(() => import('./pages/Stellar'));
 const Roadmap = lazy(() => import('./pages/Roadmap'));
 const Grants = lazy(() => import('./pages/Grants'));
@@ -81,6 +82,7 @@ export default function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/newsletter" element={<Newsletter />} />
             <Route path="/use-cases" element={<UseCases />} />
+            <Route path="/use-cases/calculator" element={<CostCalculatorPage />} />
             <Route path="/roadmap" element={<Roadmap />} />
             <Route path="/case-studies" element={<CaseStudies />} />
             <Route path="/case-studies/:slug" element={<CaseStudies />} />
