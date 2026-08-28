@@ -23,12 +23,25 @@ jobs:
         run: pnpm exec vitest run src/__tests__/CostCalculator.test.tsx
       - run: pnpm build
 
+      - name: Start preview server
+        run: |
+          pnpm preview --host 127.0.0.1 > /tmp/wraith-preview.log 2>&1 &
+          echo $! > /tmp/wraith-preview.pid
+          for i in {1..30}; do
+            if curl -sf http://127.0.0.1:4173/use-cases/calculator >/dev/null; then
+              echo "Preview server ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/wraith-preview.log
+          exit 1
+
       - name: Lighthouse calculator mobile
         uses: treosh/lighthouse-ci-action@v12
         with:
           urls: |
-            http://localhost:4173/use-cases/calculator
-          startServerCommand: pnpm preview
+            http://127.0.0.1:4173/use-cases/calculator
           uploadArtifacts: true
           temporaryPublicStorage: true
 
@@ -39,8 +52,7 @@ jobs:
         uses: treosh/lighthouse-ci-action@v12
         with:
           urls: |
-            http://localhost:4173/use-cases/calculator
-          startServerCommand: pnpm preview
+            http://127.0.0.1:4173/use-cases/calculator
           uploadArtifacts: true
           temporaryPublicStorage: true
           configPath: './.github/lhci-desktop.json'
@@ -59,7 +71,12 @@ jobs:
             desktopSeo: pct(desktop.summary.seo),
           };
           console.log('CALCULATOR_LIGHTHOUSE=' + JSON.stringify(scores));
-          if (scores.mobilePerformance < 90 || scores.mobileSeo < 90 || scores.desktopPerformance < 90 || scores.desktopSeo < 90) {
+          if (
+            scores.mobilePerformance < 90 ||
+            scores.mobileSeo < 90 ||
+            scores.desktopPerformance < 90 ||
+            scores.desktopSeo < 90
+          ) {
             process.exit(1);
           }
           NODE
