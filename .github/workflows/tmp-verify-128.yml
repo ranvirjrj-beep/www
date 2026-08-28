@@ -1,0 +1,65 @@
+name: Temporary verify issue 128
+
+on:
+  push:
+    branches:
+      - tmp/verify-128
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run focused calculator tests
+        run: pnpm exec vitest run src/__tests__/CostCalculator.test.tsx
+      - run: pnpm build
+
+      - name: Lighthouse calculator mobile
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            http://localhost:4173/use-cases/calculator
+          startServerCommand: pnpm preview
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      - name: Save mobile manifest
+        run: cp -r .lighthouseci .lighthouseci-mobile
+
+      - name: Lighthouse calculator desktop
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            http://localhost:4173/use-cases/calculator
+          startServerCommand: pnpm preview
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          configPath: './.github/lhci-desktop.json'
+
+      - name: Verify calculator Lighthouse thresholds
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const mobile = JSON.parse(fs.readFileSync('.lighthouseci-mobile/manifest.json', 'utf8'))[0];
+          const desktop = JSON.parse(fs.readFileSync('.lighthouseci/manifest.json', 'utf8'))[0];
+          const pct = (v) => Math.round(v * 100);
+          const scores = {
+            mobilePerformance: pct(mobile.summary.performance),
+            mobileSeo: pct(mobile.summary.seo),
+            desktopPerformance: pct(desktop.summary.performance),
+            desktopSeo: pct(desktop.summary.seo),
+          };
+          console.log('CALCULATOR_LIGHTHOUSE=' + JSON.stringify(scores));
+          if (scores.mobilePerformance < 90 || scores.mobileSeo < 90 || scores.desktopPerformance < 90 || scores.desktopSeo < 90) {
+            process.exit(1);
+          }
+          NODE
