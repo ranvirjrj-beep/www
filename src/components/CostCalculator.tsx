@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import {
-  CALCULATOR_CHAINS,
-  type CalculatorChain,
-} from '../data/calculatorChains';
+import { CALCULATOR_CHAINS, type CalculatorChain } from '../data/calculatorChains';
 import { copyToClipboard } from '../utils/clipboard';
 
 export type CostChain = CalculatorChain;
