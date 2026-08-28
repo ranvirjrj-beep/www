@@ -14,6 +14,7 @@ const knownRoutes = [
   '/faq',
   '/privacy',
   '/use-cases',
+  '/use-cases/calculator',
   '/roadmap',
   '/case-studies',
   '/stellar',
